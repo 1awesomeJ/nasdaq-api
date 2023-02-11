@@ -3,9 +3,14 @@ class CompaniesController < ApplicationController
 
   # GET /companies
   def index
-    @companies = Company.all
+    @companies = Company.all.paginate(page: params[:page], per_page: 15)
 
-    render json: @companies
+    meta = {
+    total_pages_available: @companies.total_pages,
+    current_page: @companies.current_page,
+    total_number_of_companies: @companies.total_entries
+    }
+    render json: {COMPANIES:@companies, METADATA:meta}
   end
 
     def to_param
