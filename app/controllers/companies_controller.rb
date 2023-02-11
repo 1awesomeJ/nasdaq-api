@@ -8,6 +8,10 @@ class CompaniesController < ApplicationController
     render json: @companies
   end
 
+    def to_param
+    ticker
+    end
+
   # GET /companies/1
   def show
     render json: @company
@@ -27,7 +31,7 @@ class CompaniesController < ApplicationController
   # PATCH/PUT /companies/1
   def update
     if @company.update(company_params)
-      render json: @company
+     render json: @company
     else
       render json: @company.errors, status: :unprocessable_entity
     end
@@ -41,7 +45,7 @@ class CompaniesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_company
-      @company = Company.find(params[:id])
+      @company = Company.find_by(ticker: params[:ticker])
     end
 
     # Only allow a list of trusted parameters through.
