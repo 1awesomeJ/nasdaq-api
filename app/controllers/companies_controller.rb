@@ -1,6 +1,6 @@
 class CompaniesController < ApplicationController
   before_action :set_company, only: %i[ show update destroy ]
-
+  before_action :authenticate_user!, except: [:index, :show]
   # GET /companies
   def index
     @companies = Company.all.paginate(page: params[:page], per_page: 15)

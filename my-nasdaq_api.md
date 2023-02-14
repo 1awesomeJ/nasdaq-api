@@ -1,9 +1,53 @@
 # My Nasdaq API #
 
-This API allows you to get stock information about companies quoted on NASDAQ whose valuation are $2bn or higher.
+This API allows you to get stocks information about companies quoted on NASDAQ whose valuation are $2bn or higher.
 
 The API is available at 'http://35.155.212.2:3000/'
 
+## API Authentication##
+Requests to post, edit, or delete a company require authentication.
+So you need to create a user account in order to generate an authentication token.
+
+To create a user account, send a POST request to http://35.155.212.2:3000/Auth/
+
+with a JSON containing the following parameters: 
+email: string -Required
+password: string -Required
+password_confirmation: string -Required
+user_name: string
+full_name: string
+
+Here is an example:
+
+{
+    "email": "omojolajoshua@yahoo.com",
+    "password": "awesome",
+    "password_confirmation": "awesome",
+    "full_name": "Joshua D OMOJOLA",
+    "user_name": "Josh"
+}
+if you're sending the request as "raw" from "body" (on Postman), make sure to select type as JSON (not Texxt), also make sure to check for commas, colons, and double quotes where necessary. 
+You may choose to use the params option intead and enter your details as key/value pairs.
+
+Check the header of your response to extract your token in this form:
+
+access-token: 1YrX1nmENs94qeTBIAYZ-w
+token-type: Bearer
+client: QjPpIjrVdU0-QdBsHcOBRg
+expiry:167753998
+uid: omojolajoshua@yahoo.com
+Authorization: Bearer eyJhY2Nlc3MtdG9rZW4iOiIxWXJYMW5tRU5zOTRxZVRCSUFZWi13IiwidG9rZW4tdHlwZSI6IkJlYXJlciIsImNsaWVudCI6IlFqUHBJanJWZFUwLVFkQnNIY09CUmciLCJleHBpcnkiOiIxNjc3NTM5OTg3IiwidWlkIjoic2VydmljZXMuZ2d0cnVzdEBnYW1pbC5jb20ifQ==
+
+copy the Authorization somewhere safely as you would include it in your subsequent POST, PUT and DELETE requests.
+
+
+If you already have an account,
+use POST '/Auth/sign_in' to sign in to your account.
+The body of your POST request should include your correct email and password.
+
+i.e send your email and password either as key/value pair or as JSON to http://35.155.212.2:3000/Auth/sign_in as a POST request.
+
+check the header of your response if the sign in request is succesful, then extract your Authorization token from the header, so you can use it in your requests where required.
 ## Endpoints ##
 
 ### companies#index ###
@@ -74,6 +118,8 @@ POST `/companies`
 
 Allows you to add a new company to the model. Requires authentication.
 
+set a key/value on your header with key being 'Authorization' and the value being the Authorization token you got after sign in or sign up. Remember to check the header of your response for i after a successful sign in/up. while using the key/value option to set your authorization key in the header, you should put every part of the key including the string 'Bearer' that begins the key.
+
 A post request should be sent with all the required attributes as a JSON.
 There are 6 required attributes: "ticker", "name", "price", "market_cap", "IPO_year", and "sector"
 
@@ -115,18 +161,6 @@ The request body needs to be in JSON format and include the following properties
  - `IPO_year` - Integer - Required
  - `sector` - String - Required
 
-Example
-```
-POST /orders/
-Authorization: Bearer <YOUR TOKEN>
-
-{
-  "bookId": 1,
-  "customerName": "John"
-}
-```
-
-The response body will contain the order Id.
 
 ### Edit/Update a company ###
 
@@ -134,7 +168,9 @@ PUT `/companies/ticker`
 
 Allows you to edit a company. Requires authentication.
 
-for instance, to edit Microsoft Corporation, you need to know their ticker a 'MSFT'
+set a key/value on your header with key being 'Authorization' and the value being the Authorization token you got after sign in or sign up. Remember to check the header of your response for i after a successful sign in/up. while using the key/value option to set your authorization key in the header, you should put every part of the key including the string 'Bearer' that begins the key.
+
+To edit Microsoft Corporation, for instance, you need to know their ticker a 'MSFT'
 then senf a PUT request with a JSON of the 6 required attributes to:
 PUT '/companies/MSFT'
 i.e send a PUT request to 'http://35.155.212.2:3000/MSFT'
@@ -178,6 +214,8 @@ DELETE `/companies/:ticker`
 
 Delete an existing compnay. Requires authentication.
 
+set a key/value on your header with key being 'Authorization' and the value being the Authorization token you got after sign in or sign up. Remember to check the header of your response for i after a successful sign in/up. while using the key/value option to set your authorization key in the header, you should put every part of the key including the string 'Bearer' that begins the key.
+
 The request body needs to be empty.
 
  Example
@@ -188,31 +226,3 @@ i.e To delete Microsoft Corporation, send a DELETE request to:
 'http://35.155.212.2:3000/companies/MSFT'
 
 make sure it's a DELETE request, then send.
-Authorization: Bearer <YOUR TOKEN>
-```
-
-## API Authentication ##
-
-To submit or view an order, you need to register your API client.
-
-POST `/api-clients/`
-
-The request body needs to be in JSON format and include the following properties:
-
- - `clientName` - String
- - `clientEmail` - String
-
- Example
-
- ```
- {
-    "clientName": "Postman",
-    "clientEmail": "valentin@example.com"
-}
- ```
-
-The response body will contain the access token. The access token is valid for 7 days.
-
-**Possible errors**
-
-Status code 409 - "API client already registered." Try changing the values for `clientEmail` and `clientName` to something else.
